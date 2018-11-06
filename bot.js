@@ -1,7 +1,8 @@
 const { RTMClient, WebClient } = require('@slack/client');
+const auth = require('./auth/authTokens.js');
 
 // OAuth token to be able to access the app
-const token = 'xoxb-471927783220-471421163680-lcKUfqGYO5tnKe8EOOpEwTfy';
+const token = auth.oauthToken;
 
 //Start a RealTimeMessager Client session with the oauth token
 const rtm = new RTMClient(token);
@@ -14,8 +15,8 @@ const channelID = 'CDXHFFX3Q';
 // The RTM client can send simple string messages
 */
 
-//This uses the WebClient to search through any channels that the bot may be a part of
-// not really sure if this is the best way to do this but I can find the channel ID like this
+// This uses the WebClient to search through any channels that the bot may be a part of
+// This is mostly to announce the bot to each channel
 const web = new WebClient(token);
 web.channels.list()
   .then((res) => {
@@ -39,7 +40,9 @@ rtm.on('message', (message) => {
   // This will constantly check for messages in any channel that the bot is part of
   // we can parse this messages and send the data to dialogflow to get a reponse back.
 
-  rtm.sendMessage(`New message found: ${message.text}`, channelID)
+  //console.log(message);
+
+  rtm.sendMessage(`New message found: ${message.text}`, message.channel)
   .then((res) => {
     // `res` contains information about the posted message
     console.log('Message sent: ', res.ts);
