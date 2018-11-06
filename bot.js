@@ -1,5 +1,6 @@
 const { RTMClient, WebClient } = require('@slack/client');
 const auth = require('./auth/authTokens.js');
+const dialogFlowController = require('./controllers/DialogFlowController.js')
 
 // OAuth token to be able to access the app
 const token = auth.oauthToken;
@@ -8,18 +9,10 @@ const token = auth.oauthToken;
 const rtm = new RTMClient(token);
 rtm.start();
 
-//Found this from running the previous command
-const channelID = 'CDXHFFX3Q';
-
-/*
-// The RTM client can send simple string messages
-*/
-
 // This uses the WebClient to search through any channels that the bot may be a part of
 // This is mostly to announce the bot to each channel
 const web = new WebClient(token);
-web.channels.list()
-  .then((res) => {
+web.channels.list().then((res) => {
     // Take any channel for which the bot is a member
     const channel = res.channels.find(c => c.is_member);
 
@@ -35,26 +28,27 @@ web.channels.list()
     }
   });
 
+
+
 rtm.on('message', (message) => {
   // Theres more event handling api stuff at:  https://api.slack.com/events/message
   // This will constantly check for messages in any channel that the bot is part of
   // we can parse this messages and send the data to dialogflow to get a reponse back.
 
   //console.log(message);
+  dialogFlowController.getMessageResponse(message.text);
 
   rtm.sendMessage(`New message found: ${message.text}`, message.channel)
-  .then((res) => {
-    // `res` contains information about the posted message
-    console.log('Message sent: ', res.ts);
-  })
-  .catch(console.error);
+    .then((res) => {
+      // `res` contains information about the posted message
+      console.log('Message sent: ', res.ts);
+    })
+    .catch(console.error);
 
   console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
 
   // Skip messages that are from a bot or my own user ID
-  if ( (message.subtype && message.subtype === 'bot_message') || (!message.subtype && message.user === rtm.activeUserId) ) {
+  if ((message.subtype && message.subtype === 'bot_message') || (!message.subtype && message.user === rtm.activeUserId)) {
     return;
   }
-
 });
-  
