@@ -1,48 +1,28 @@
+'use strict';
 const auth = require('./../auth/authTokens.js');
 const dialogflow = require('dialogflow');
-
+const apiai = require('apiai');
 
 module.exports = {
 
-	getMessageResponse: function (sentMessage) {
-		const projectId = auth.dialogFlowClientID; 
-		const sessionId = auth.dialogFlowSessionID; 
+	getMessageResponse: function (sentMessage, callback) {
 
-		const sessionClient = new dialogflow.SessionsClient();
-		const sessionPath = sessionClient.sessionPath(projectId, sessionId);
+		var app = apiai(auth.dialogFlowSessionID);
 
-		//********************************************
+		var request = app.textRequest(sentMessage, {
+		    sessionId: '12345'
+		});
 
-		// The text query request.
-		const request = {
-		  session: sessionPath,
-		  queryInput: {
-		    text: {
-		      text: sentMessage,
-		      languageCode: 'en-US',
-		    },
-		  },
-		};
+		request.on('response', function(response) {
+			//console.log(response);
+		    return callback(response.result.fulfillment.speech);
+		});
 
+		request.on('error', function(error) {
+			console.log('im an error!!!');
+		    console.log(error);
+		});
 
-		sessionClient.detectIntent(request)
-		  .then(responses => {
-		    console.log('Detected intent');
-		    const result = responses[0].queryResult;
-		    console.log(`  Query: ${result.queryText}`);
-		    console.log(`  Response: ${result.fulfillmentText}`);
-		    if (result.intent) {
-		      console.log(`  Intent: ${result.intent.displayName}`);
-		    } else {
-		      console.log(`  No intent matched.`);
-		    }
-		  })
-		  .catch(err => {
-		    console.error('ERROR:', err);
-		  });
+		request.end();
 	}
-
-
-	
-
 }

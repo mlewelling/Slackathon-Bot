@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@slack/client": "^4.8.0",
+    "apiai": "^4.0.3",
     "dialogflow": "^0.7.0"
   }
 }
