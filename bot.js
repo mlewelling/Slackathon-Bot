@@ -3,6 +3,7 @@ const auth = require('./auth/authTokens.js');
 const dialogFlowController = require('./controllers/DialogFlowController.js');
 const firebaseController = require('./controllers/FirebaseConnection.js');
 const firebase = require('firebase');
+const moment = require('moment');
 
 var serviceAccount = require("./auth/service-account.json");
 firebase.initializeApp(serviceAccount);
@@ -48,7 +49,6 @@ rtm.on('message', (message) => {
           })
           .catch(console.error);
         } else {
-
           
           webClient.chat.postMessage({ channel: message.channel, text: responseText, thread_ts: message.ts })
           .then((res) => {
@@ -62,17 +62,17 @@ rtm.on('message', (message) => {
         //add to database
         var data = {
           questionText: messageText,
-          timeStamp: message.ts,
-          questionUser: message.user
+          messageTS: message.ts,
+          questionUser: message.user,
+          timeStamp: new Date(),
+          reminderSent: false
         }
         
         firebaseController.addFirebaseData(data, function(response) {
-          console.log("Data added to firestore:")
+          console.log("Data added to firestore:");
           console.log(response);
         });
-        
       }
-      
       //console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
       
     });
