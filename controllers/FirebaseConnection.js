@@ -1,21 +1,20 @@
-var admin = require('firebase-admin');
-
-var serviceAccount = require('path/to/serviceAccountKey.json');
-
+const firebase = require('firebase');
 
 module.exports = {
 
 	addFirebaseData: function (dataObject, callback) {
-		
-		admin.initializeApp({
-		  credential: admin.credential.cert(serviceAccount),
-		  databaseURL: 'https://<DATABASE_NAME>.firebaseio.com'
+
+		var firestore = firebase.firestore();
+
+  		firestore.settings({ 
+			timestampsInSnapshots: true
 		});
 
+		firestore.collection("UserQuestions").add(dataObject);
 
+		return callback(dataObject);
 
-
-	}
+	},
 
 	readFirebaseData: function (data_timestamp) {
 

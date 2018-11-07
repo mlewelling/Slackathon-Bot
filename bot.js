@@ -1,7 +1,11 @@
 const { RTMClient, WebClient } = require('@slack/client');
 const auth = require('./auth/authTokens.js');
-const dialogFlowController = require('./controllers/DialogFlowController.js')
+const dialogFlowController = require('./controllers/DialogFlowController.js');
+const firebaseController = require('./controllers/FirebaseConnection.js');
+const firebase = require('firebase');
 
+var serviceAccount = require("./auth/service-account.json");
+firebase.initializeApp(serviceAccount);
 // OAuth token to be able to access the app
 const token = auth.oauthToken;
 
@@ -15,7 +19,9 @@ const webClient = new WebClient(token);
 
 rtm.on('message', (message) => {
 
-  if (message === undefined || message.text === undefined || message.text.length === 0){ 
+  console.log(message);
+
+  if (message === undefined || message.text === undefined || message.text.length === 0) { 
     return; 
   }
   //Don't allow the bot to read it's own messages
@@ -31,33 +37,48 @@ rtm.on('message', (message) => {
 
     dialogFlowController.getMessageResponse(message.text, function(responseText) {
       
-      //TODO:
-      // add if condition if there are any thread counts
-      if ( message.thread_ts !== undefined ) {
+      if (responseText.length !== 0) {
+        //TODO:
+        // add if condition if there are any thread counts
+        if ( message.thread_ts !== undefined ) {
 
-        webClient.chat.postMessage({ channel: message.channel, text: responseText, thread_ts: message.thread_ts })
-        .then((res) => {
-          console.log('Message sent: ', res.ts);
-        })
-        .catch(console.error);
+          webClient.chat.postMessage({ channel: message.channel, text: responseText, thread_ts: message.thread_ts })
+          .then((res) => {
+            console.log('Message sent: ', res.ts);
+          })
+          .catch(console.error);
+        } else {
+
+          
+          webClient.chat.postMessage({ channel: message.channel, text: responseText, thread_ts: message.ts })
+          .then((res) => {
+            console.log('Message sent: ', res.ts);
+          })
+          .catch(console.error);
+          
+        }
       } else {
-
+        console.log("unknown question");
+        //add to database
+        var data = {
+          questionText: messageText,
+          timeStamp: message.ts,
+          questionUser: message.user
+        }
         
-        webClient.chat.postMessage({ channel: message.channel, text: responseText, thread_ts: message.ts })
-        .then((res) => {
-          console.log('Message sent: ', res.ts);
-        })
-        .catch(console.error);
+        firebaseController.addFirebaseData(data, function(response) {
+          console.log("Data added to firestore:")
+          console.log(response);
+        });
         
       }
+      
       //console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
-
+      
     });
-  } else {
-    console.log("Unknown question");
-    //add to database here
 
-    
+  } else {
+    console.log("question in wrong format");
   }
 
 });
