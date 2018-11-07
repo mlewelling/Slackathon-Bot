@@ -65,6 +65,7 @@ rtm.on('message', (message) => {
           messageTS: message.ts,
           questionUser: message.user,
           timeStamp: new Date(),
+          channelId: message.channel,
           reminderSent: false
         }
         

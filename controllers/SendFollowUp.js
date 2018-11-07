@@ -8,24 +8,15 @@ module.exports = {
 
     sendFollowUp: function (webClient, dataObject, callback) {
 
-        webClient.chat.postMessage({ channel: dataObject.questionUser, text: "Was this question of your's answered? \n" + dataObject.questionText, attachments: [{
-            "fallback": "You are unable to choose answer.",
-            "callback_id": "followup_response",
-            "color": "#3AA3E3",
-            "actions": [{
-                "name": "answer_button",
-                "text":"Yes",
-                "type":"button",
-                "value":"yes"
-              },
-              {
-                "name": "answer_button",
-                "text":"No",
-                "type":"button",
-                "value":"no"
-              }]
-            }]
-          })
+        var newMessageTS = dataObject.messageTS.replace('.', '');
+        console.log(newMessageTS);
+
+        webClient.chat.postMessage({ channel: dataObject.questionUser, 
+        text: `<@${dataObject.questionUser}> Has your question been answered?`,
+        attachments: [{
+            text:`'${dataObject.questionText}'\n\nhttps://phoenixfyre.slack.com/archives/${dataObject.channelId}/p${newMessageTS}`
+        }] 
+        })
         .then((req,res) => {
             console.log("Send button to user");
         })

@@ -34,6 +34,7 @@ cron.schedule('* * * * *', function() {
 				messageTS: doc.messageTS,
 				questionUser: doc.questionUser,
 				timeStamp: doc.timeStamp,
+				channelId: doc.channelId,
 				reminderSent: true
 			}
 
