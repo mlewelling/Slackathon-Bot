@@ -10,7 +10,7 @@ module.exports = {
 			timestampsInSnapshots: true
 		});
 
-		firestore.collection("UserQuestions").add(dataObject);
+		firestore.collection("UserQuestions").doc(dataObject.messageTS).set(dataObject);
 
 		return callback(dataObject);
 
@@ -41,6 +41,22 @@ module.exports = {
 
 	 	return callback(queryResults);
 
+	},
+
+	updateFirebaseReminder: function (dataObject, callback) {
+		var firestore = firebase.firestore();
+
+		firestore.settings({ 
+			timestampsInSnapshots: true
+		});
+
+		var userQuestionsRef = firestore.collection('UserQuestions');
+
+		//var questionToUpdateRef = userQuestionsRef.where('messageTS', '==', `${uniqueId}`);
+
+		var questionToUpdateRef = userQuestionsRef.doc(dataObject.messageTS);
+
+		var questionToUpdate = questionToUpdateRef.set(dataObject);
 	}
 
 }

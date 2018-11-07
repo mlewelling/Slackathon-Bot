@@ -8,7 +8,7 @@ module.exports = {
 
     sendFollowUp: function (webClient, dataObject, callback) {
 
-        webClient.chat.postMessage({ channel: "CDXHFFX3Q", text: "Was your question answered?", attachments: [{
+        webClient.chat.postMessage({ channel: dataObject.questionUser, text: "Was this question of your's answered? \n" + dataObject.questionText, attachments: [{
             "fallback": "You are unable to choose answer.",
             "callback_id": "followup_response",
             "color": "#3AA3E3",
@@ -27,18 +27,7 @@ module.exports = {
             }]
           })
         .then((req,res) => {
-            console.log("in .then");
-            app.post('/slack/actions', urlencodedParser, (req, res) =>{
-                console.log("in post ", req, res);
-                res.status(200).end() // best practice to respond with 200 status
-                var actionJSONPayload = JSON.parse(req.body.payload) // parse URL-encoded payload JSON string
-                var message = {
-                    "text": actionJSONPayload.user.name+" clicked: "+actionJSONPayload.actions[0].name,
-                    "replace_original": false
-                }
-                sendMessageToSlackResponseURL(actionJSONPayload.response_url, message)
-            })
-                  console.log('Follow up message sent! ', res);
+            console.log("Send button to user");
         })
         .catch(console.error);
     }
