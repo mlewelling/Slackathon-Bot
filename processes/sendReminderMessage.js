@@ -8,6 +8,8 @@ var serviceAccount = require("../auth/service-account.json");
 const { WebClient } = require('@slack/client');
 firebase.initializeApp(serviceAccount);
 
+var lastKnownMessageTs = "";
+
 
 cron.schedule('* * * * *', function() {
 
@@ -37,6 +39,8 @@ cron.schedule('* * * * *', function() {
 				channelId: doc.channelId,
 				reminderSent: true
 			}
+
+			lastKnownMessageTs = doc.messageTS;
 
 			if ( timeDifferenceInMinutes >= 1 && doc.reminderSent == false ) {
 				sendFollowUp.sendFollowUp(webClient, data, function(response) {

@@ -11,7 +11,7 @@ module.exports = {
         var newMessageTS = dataObject.messageTS.replace('.', '');
         console.log(newMessageTS);
 
-        webClient.chat.postMessage({ channel: dataObject.questionUser, 
+        webClient.chat.postMessage({ channel: "DDW4NLKPC", 
         text: `<@${dataObject.questionUser}> Has your question been answered?`,
         attachments: [{
             text:`'${dataObject.questionText}'\n\nhttps://phoenixfyre.slack.com/archives/${dataObject.channelId}/p${newMessageTS}`
