@@ -45,7 +45,8 @@ rtm.on('message', (message) => {
   messageText = messageText.toLowerCase();
 
   if ( messageText.includes("what") || messageText.includes("how") || messageText.includes("why") || messageText.includes("where") ||
-       messageText.includes("hi") || messageText.includes("hello") || messageText.includes("?") || messageText.includes("food") || messageText.includes("yes") || messageText.includes("yeah")) {
+       messageText.includes("hi") || messageText.includes("hello") || messageText.includes("?") || messageText.includes("food") || messageText.includes("yes") || messageText.includes("yeah") ||
+       messageText.includes("good bot") ) {
 
     dialogFlowController.getMessageResponse(message.text, function(responseText) {
       
